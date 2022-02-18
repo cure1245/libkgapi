@@ -8,8 +8,6 @@
 
 #include "fieldmetadata.h"
 
-#include "source.h"
-
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QJsonValue>
@@ -19,6 +17,15 @@
 
 namespace KGAPI2::People
 {
+
+struct FieldMetadataDefinition
+{
+    bool primary;
+    bool sourcePrimary;
+    bool verified;
+    Source source;
+};
+
 class FieldMetadata::Private : public QSharedData
 {
 public:
@@ -48,6 +55,15 @@ public:
 FieldMetadata::FieldMetadata()
     : d(new Private)
 {
+}
+
+FieldMetadata::FieldMetadata(FieldMetadataDefinition definition)
+    : d(new Private)
+{
+    d->primary = definition.primary;
+    d->sourcePrimary = definition.sourcePrimary;
+    d->verified = definition.verified;
+    d->source = definition.source;
 }
 
 FieldMetadata::FieldMetadata(const FieldMetadata &) = default;
@@ -95,7 +111,15 @@ bool FieldMetadata::verified() const
 
 FieldMetadata FieldMetadata::fromJSON(const QJsonObject &obj)
 {
-    Q_UNUSED(obj);
+    if(!obj.isEmpty()) {
+        FieldMetadataDefinition definition;
+        definition.primary = obj.value(QStringLiteral("primary")).toBool();
+        definition.sourcePrimary = obj.value(QStringLiteral("sourcePrimary")).toBool();
+        definition.verified = obj.value(QStringLiteral("verified")).toBool();
+        definition.source = Source::fromJSON(obj.value(QStringLiteral("source")).toObject());
+
+        return FieldMetadata(definition);
+    }
     return FieldMetadata();
 }
 

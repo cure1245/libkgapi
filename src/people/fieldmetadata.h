@@ -10,6 +10,7 @@
 
 #include <QSharedDataPointer>
 #include <kgapipeople_export.h>
+#include "source.h"
 
 #include <optional>
 
@@ -18,7 +19,8 @@ class QJsonValue;
 
 namespace KGAPI2::People
 {
-class Source;
+
+struct FieldMetadataDefinition;
 
 /**
  * Metadata about a field.
@@ -33,6 +35,7 @@ public:
     explicit FieldMetadata();
     FieldMetadata(const FieldMetadata &);
     FieldMetadata(FieldMetadata &&) noexcept;
+    FieldMetadata(FieldMetadataDefinition definition);
     FieldMetadata &operator=(const FieldMetadata &);
     FieldMetadata &operator=(FieldMetadata &&) noexcept;
     /** Destructor. **/
