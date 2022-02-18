@@ -9,6 +9,7 @@
 #pragma once
 
 #include "object.h"
+#include "types.h"
 #include <kgapipeople_export.h>
 
 #include <QString>
@@ -24,7 +25,6 @@ class QJsonValue;
 namespace KGAPI2::People
 {
 class Person;
-using PersonPtr = QSharedPointer<Person>;
 
 class Address;
 class AgeRangeType;
@@ -62,6 +62,45 @@ class Tagline;
 class Url;
 class UserDefined;
 
+// Used for the constructor.
+// There are some fields that are output only, so a person definition lets us
+// set the fields that we need on construction and leave them read-only after.
+
+// We are ignoring DEPRECATED fields because why bother, they return nothing
+// from the API.
+struct PersonDefinition {
+    QString resourceName;
+    QString etag;
+    QVector<Address> addresses;
+    QVector<AgeRangeType> ageRanges;
+    QVector<Biography> biographies;
+    QVector<Birthday> birthdays;
+    QVector<CalendarUrl> calendarUrls;
+    QVector<ClientData> clientData;
+    QVector<CoverPhoto> coverPhotos;
+    QVector<EmailAddress> emailAddresses;
+    QVector<Event> events;
+    QVector<ExternalId> externalIds;
+    QVector<FileAs> fileAses;
+    QVector<Gender> genders;
+    QVector<ImClient> imClients;
+    QVector<Interest> interests;
+    QVector<PersonLocale> locales;
+    QVector<Location> locations;
+    QVector<Membership> memberships;
+    QVector<MiscKeyword> miscKeywords;
+    QVector<Name> names;
+    QVector<Nickname> nicknames;
+    QVector<Occupation> occupations;
+    QVector<Organization> organizations;
+    QVector<PhoneNumber> phoneNumbers;
+    QVector<Photo> photos;
+    QVector<Relation> relations;
+    QVector<SipAddress> sipAddress;
+    QVector<Skill> skills;
+    QVector<UserDefined> userDefined;
+};
+
 /**
  * Information about a person merged from various data sources such as the
  * authenticated user's contacts and profile data. Most fields can have multiple
@@ -81,8 +120,9 @@ public:
         TWENTY_ONE_OR_OLDER, ///< Twenty-one and older.
     };
 
-    /** Construcuts a new Person **/
+    /** Constructs a new Person **/
     explicit Person();
+    Person(PersonDefinition definition);
     /** Destructor. **/
     ~Person();
 

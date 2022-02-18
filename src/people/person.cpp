@@ -103,6 +103,41 @@ Person::Person()
 {
 }
 
+Person::Person(PersonDefinition definition)
+    : d(new Private)
+{
+    d->resourceName = definition.resourceName;
+    d->etag = definition.etag;
+    d->addresses = definition.addresses;
+    d->ageRanges = definition.ageRanges;
+    d->biographies = definition.biographies;
+    d->birthdays = definition.birthdays;
+    d->calendarUrls = definition.calendarUrls;
+    d->clientData = definition.clientData;
+    d->coverPhotos = definition.coverPhotos;
+    d->emailAddresses = definition.emailAddresses;
+    d->events = definition.events;
+    d->externalIds = definition.externalIds;
+    d->fileAses = definition.fileAses;
+    d->genders = definition.genders;
+    d->imClients = definition.imClients;
+    d->interests = definition.interests;
+    d->locales = definition.locales;
+    d->locations = definition.locations;
+    d->memberships = definition.memberships;
+    d->miscKeywords = definition.miscKeywords;
+    d->names = definition.names;
+    d->nicknames = definition.nicknames;
+    d->occupations = definition.occupations;
+    d->organizations = definition.organizations;
+    d->phoneNumbers = definition.phoneNumbers;
+    d->photos = definition.photos;
+    d->relations = definition.relations;
+    d->sipAddresses = definition.sipAddress;
+    d->skills = definition.skills;
+    d->userDefined = definition.userDefined;
+}
+
 Person::~Person() = default;
 
 QVector<Nickname> Person::nicknames() const
