@@ -9,6 +9,8 @@
 #pragma once
 
 #include <QSharedDataPointer>
+#include <QJsonArray>
+#include <QJsonObject>
 #include <kgapipeople_export.h>
 
 #include <QString>
@@ -44,7 +46,8 @@ public:
     bool operator==(const Address &) const;
     bool operator!=(const Address &) const;
 
-    static Address fromJSON(const QJsonObject &);
+    static Address fromJSON(const QJsonObject &obj);
+    static QVector<Address> fromJSONArray(const QJsonArray &data);
     QJsonValue toJSON() const;
 
     /** Output only. The type of the address translated and formatted in the viewer's account locale or the `Accept-Language` HTTP header locale. **/

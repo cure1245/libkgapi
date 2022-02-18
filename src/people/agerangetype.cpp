@@ -10,8 +10,6 @@
 
 #include "fieldmetadata.h"
 
-#include <QJsonArray>
-#include <QJsonObject>
 #include <QJsonValue>
 #include <QSharedData>
 
@@ -124,6 +122,22 @@ QJsonValue AgeRangeType::toJSON() const
     }
     obj.insert(QStringView{u"metadata"}, d->metadata.toJSON());
     return obj;
+}
+
+QVector<AgeRangeType> AgeRangeType::fromJSONArray(const QJsonArray& data)
+{
+    QVector<People::AgeRangeType> ageRanges;
+
+    for(const auto ageRangeObj : data) {
+        if(ageRangeObj.isObject()) {
+            const auto objectifiedAgeRange = ageRangeObj.toObject();
+            if(objectifiedAgeRange.contains(QStringLiteral("ageRange"))) {
+                ageRanges.append(fromJSON(objectifiedAgeRange));
+            }
+        }
+    }
+
+    return ageRanges;
 }
 
 } // namespace KGAPI2::People

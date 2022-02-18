@@ -10,6 +10,8 @@
 
 #include <QSharedDataPointer>
 #include <kgapipeople_export.h>
+#include <QJsonArray>
+#include <QJsonObject>
 
 #include <optional>
 
@@ -48,7 +50,8 @@ public:
     bool operator==(const AgeRangeType &) const;
     bool operator!=(const AgeRangeType &) const;
 
-    static AgeRangeType fromJSON(const QJsonObject &);
+    static AgeRangeType fromJSON(const QJsonObject &obj);
+    static QVector<AgeRangeType> fromJSONArray(const QJsonArray &data);
     QJsonValue toJSON() const;
 
     /** The age range. **/

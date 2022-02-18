@@ -10,8 +10,6 @@
 
 #include "fieldmetadata.h"
 
-#include <QJsonArray>
-#include <QJsonObject>
 #include <QJsonValue>
 #include <QSharedData>
 
@@ -183,8 +181,9 @@ void Address::setCountry(const QString &value)
 Address Address::fromJSON(const QJsonObject &obj)
 {
     if(!obj.isEmpty()) {
-        People::Address address;
+        Address address;
 
+        address.setMetadata(FieldMetadata::fromJSON(obj.value(QStringLiteral("metadata")).toObject()));
         address.setFormattedValue(obj.value(QStringLiteral("formattedValue")).toString());
         address.setType(obj.value(QStringLiteral("type")).toString());
         address.setPoBox(obj.value(QStringLiteral("poBox")).toString());
@@ -200,6 +199,20 @@ Address Address::fromJSON(const QJsonObject &obj)
     }
 
     return Address();
+}
+
+QVector<Address> Address::fromJSONArray(const QJsonArray& data)
+{
+    QVector<People::Address> addresses;
+
+    for(const auto address : data) {
+        if(address.isObject()) {
+            const auto objectifiedAddress = address.toObject();
+            addresses.append(fromJSON(objectifiedAddress));
+        }
+    }
+
+    return addresses;
 }
 
 QJsonValue Address::toJSON() const
