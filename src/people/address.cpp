@@ -182,7 +182,23 @@ void Address::setCountry(const QString &value)
 
 Address Address::fromJSON(const QJsonObject &obj)
 {
-    Q_UNUSED(obj);
+    if(!obj.isEmpty()) {
+        People::Address address;
+
+        address.setFormattedValue(obj.value(QStringLiteral("formattedValue")).toString());
+        address.setType(obj.value(QStringLiteral("type")).toString());
+        address.setPoBox(obj.value(QStringLiteral("poBox")).toString());
+        address.setStreetAddress(obj.value(QStringLiteral("streetAddress")).toString());
+        address.setExtendedAddress(obj.value(QStringLiteral("extendedAddress")).toString());
+        address.setCity(obj.value(QStringLiteral("city")).toString());
+        address.setRegion(obj.value(QStringLiteral("region")).toString());
+        address.setPostalCode(obj.value(QStringLiteral("postalCode")).toString());
+        address.setCountry(obj.value(QStringLiteral("country")).toString());
+        address.setCountryCode(obj.value(QStringLiteral("countryCode")).toString());
+
+        return address;
+    }
+
     return Address();
 }
 
