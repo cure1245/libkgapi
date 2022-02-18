@@ -85,7 +85,22 @@ void AgeRangeType::setMetadata(const FieldMetadata &value)
 
 AgeRangeType AgeRangeType::fromJSON(const QJsonObject &obj)
 {
-    Q_UNUSED(obj);
+    if(!obj.isEmpty()) {
+        AgeRangeType ageRangeType;
+        const auto val = obj.value(QStringLiteral("ageRange")).toString();
+
+        if(val == QStringLiteral("LESS_THAN_EIGHTEEN")) {
+            ageRangeType.setAgeRange(AgeRange::LESS_THAN_EIGHTEEN);
+        } else if(val == QStringLiteral("EIGHTEEN_TO_TWENTY")) {
+            ageRangeType.setAgeRange(AgeRange::EIGHTEEN_TO_TWENTY);
+        } else if(val == QStringLiteral("TWENTY_ONE_OR_OLDER")) {
+            ageRangeType.setAgeRange(AgeRange::TWENTY_ONE_OR_OLDER);
+        } else {
+            ageRangeType.setAgeRange(AgeRange::AGE_RANGE_UNSPECIFIED);
+        }
+
+        return ageRangeType;
+    }
     return AgeRangeType();
 }
 
