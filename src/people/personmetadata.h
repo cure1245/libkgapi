@@ -22,6 +22,7 @@ class QJsonValue;
 namespace KGAPI2::People
 {
 class Source;
+struct PersonMetadataDefinition;
 
 /**
  * The metadata about a person.
@@ -40,6 +41,7 @@ public:
 
     /** Constructs a new PersonMetadata **/
     explicit PersonMetadata();
+    PersonMetadata(const PersonMetadataDefinition &definition);
     PersonMetadata(const PersonMetadata &);
     PersonMetadata(PersonMetadata &&) noexcept;
     PersonMetadata &operator=(const PersonMetadata &);

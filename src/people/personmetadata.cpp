@@ -19,6 +19,16 @@
 
 namespace KGAPI2::People
 {
+
+struct PersonMetadataDefinition
+{
+    QVector<Source> sources;
+    QVector<QString> previousResourceNames;
+    QVector<QString> linkedPeopleResourceNames;
+    bool deleted;
+    PersonMetadata::ObjectType objectType;
+};
+
 class PersonMetadata::Private : public QSharedData
 {
 public:
@@ -50,6 +60,16 @@ public:
 PersonMetadata::PersonMetadata()
     : d(new Private)
 {
+}
+
+PersonMetadata::PersonMetadata(const KGAPI2::People::PersonMetadataDefinition &definition)
+    : d(new Private)
+{
+    d->sources = definition.sources;
+    d->previousResourceNames = definition.previousResourceNames;
+    d->linkedPeopleResourceNames = definition.linkedPeopleResourceNames;
+    d->deleted = definition.deleted;
+    d->objectType = definition.objectType;
 }
 
 PersonMetadata::PersonMetadata(const PersonMetadata &) = default;
@@ -111,7 +131,27 @@ void PersonMetadata::clearSources()
 
 PersonMetadata PersonMetadata::fromJSON(const QJsonObject &obj)
 {
-    Q_UNUSED(obj);
+    if(!obj.isEmpty()) {
+        PersonMetadataDefinition definition;
+
+        for(const auto jsonSource : obj.value(QStringLiteral("sources")).toArray()) {
+            definition.sources.append(Source::fromJSON(jsonSource.toObject()));
+        }
+
+        for(const auto jsonPrevResName : obj.value(QStringLiteral("previousResourceNames")).toArray()) {
+            definition.previousResourceNames.append(jsonPrevResName.toString());
+        }
+
+        for(const auto jsonLinkedPeopleResName : obj.value(QStringLiteral("linkedPeopleResourceNames")).toArray()) {
+            definition.linkedPeopleResourceNames.append(jsonLinkedPeopleResName.toString());
+        }
+
+        definition.deleted = obj.value(QStringLiteral("deleted")).toBool();
+
+        // Don't add objectType here, is deprecated
+
+        return PersonMetadata(definition);
+    }
     return PersonMetadata();
 }
 
