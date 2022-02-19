@@ -95,8 +95,40 @@ void Biography::setValue(const QString &value)
 
 Biography Biography::fromJSON(const QJsonObject &obj)
 {
-    Q_UNUSED(obj);
+    if(!obj.isEmpty()) {
+        Biography biography;
+
+        const auto jsonMetadata = obj.value(QStringLiteral("metadata")).toObject();
+
+        biography.setMetadata(FieldMetadata::fromJSON(jsonMetadata));
+        biography.setValue(obj.value(QStringLiteral("value")).toString());
+
+        const auto jsonContentType = obj.value(QStringLiteral("contentType"));
+        if(jsonContentType == QStringLiteral("TEXT_PLAIN")) {
+            biography.setContentType(ContentType::TEXT_PLAIN);
+        } else if (jsonContentType == QStringLiteral("TEXT_HTML")) {
+            biography.setContentType(ContentType::TEXT_HTML);
+        } else {
+            biography.setContentType(ContentType::CONTENT_TYPE_UNSPECIFIED);
+        }
+
+        return biography;
+    }
     return Biography();
+}
+
+QVector<Biography> Biography::fromJSONArray(const QJsonArray &data)
+{
+    QVector<Biography> biographies;
+
+    for(const auto biography : data) {
+        if(biography.isObject()) {
+            const auto objectifiedBiography = biography.toObject();
+            biographies.append(fromJSON(objectifiedBiography));
+        }
+    }
+
+    return biographies;
 }
 
 QJsonValue Biography::toJSON() const
