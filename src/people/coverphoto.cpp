@@ -95,8 +95,32 @@ void CoverPhoto::setUrl(const QString &value)
 
 CoverPhoto CoverPhoto::fromJSON(const QJsonObject &obj)
 {
-    Q_UNUSED(obj);
+    if(!obj.isEmpty()) {
+        CoverPhoto coverPhoto;
+
+        const auto metadata = obj.value(QStringLiteral("metadata")).toObject();
+        coverPhoto.setMetadata(FieldMetadata::fromJSON(metadata));
+        coverPhoto.setUrl(obj.value(QStringLiteral("url")).toString());
+        coverPhoto.setIsDefault(obj.value(QStringLiteral("default")).toBool());
+
+        return coverPhoto;
+    }
+
     return CoverPhoto();
+}
+
+QVector<CoverPhoto> CoverPhoto::fromJSONArray(const QJsonArray& data)
+{
+    QVector<CoverPhoto> coverPhotos;
+
+    for(const auto coverPhoto : data) {
+        if(coverPhoto.isObject()) {
+            const auto objectifiedCoverPhoto = coverPhoto.toObject();
+            coverPhotos.append(fromJSON(objectifiedCoverPhoto));
+        }
+    }
+
+    return coverPhotos;
 }
 
 QJsonValue CoverPhoto::toJSON() const

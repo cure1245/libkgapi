@@ -17,6 +17,7 @@
 
 class QJsonObject;
 class QJsonValue;
+class QJsonArray;
 
 namespace KGAPI2::People
 {
@@ -44,7 +45,8 @@ public:
     bool operator==(const CoverPhoto &) const;
     bool operator!=(const CoverPhoto &) const;
 
-    static CoverPhoto fromJSON(const QJsonObject &);
+    static CoverPhoto fromJSON(const QJsonObject &obj);
+    static QVector<CoverPhoto> fromJSONArray(const QJsonArray &data);
     QJsonValue toJSON() const;
 
     /** True if the cover photo is the default cover photo; false if the cover photo is a user-provided cover photo. **/
