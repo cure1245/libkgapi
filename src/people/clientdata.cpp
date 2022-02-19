@@ -95,8 +95,32 @@ void ClientData::setValue(const QString &value)
 
 ClientData ClientData::fromJSON(const QJsonObject &obj)
 {
-    Q_UNUSED(obj);
+    if(!obj.isEmpty()) {
+        ClientData clientData;
+
+        const auto metadata = obj.value(QStringLiteral("metadata")).toObject();
+        clientData.setMetadata(FieldMetadata::fromJSON(metadata));
+        clientData.setKey(obj.value(QStringLiteral("key")).toString());
+        clientData.setValue(obj.value(QStringLiteral("value")).toString());
+
+        return clientData;
+    }
+
     return ClientData();
+}
+
+QVector<ClientData> ClientData::fromJSONArray(const QJsonArray& data)
+{
+    QVector<ClientData> clientData;
+
+    for(const auto jsonClientData : data) {
+        if(jsonClientData.isObject()) {
+            const auto objectifiedClientData = jsonClientData.toObject();
+            clientData.append(fromJSON(objectifiedClientData));
+        }
+    }
+
+    return clientData;
 }
 
 QJsonValue ClientData::toJSON() const

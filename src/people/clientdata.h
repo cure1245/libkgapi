@@ -17,6 +17,7 @@
 
 class QJsonObject;
 class QJsonValue;
+class QJsonArray;
 
 namespace KGAPI2::People
 {
@@ -44,7 +45,8 @@ public:
     bool operator==(const ClientData &) const;
     bool operator!=(const ClientData &) const;
 
-    static ClientData fromJSON(const QJsonObject &);
+    static ClientData fromJSON(const QJsonObject &obj);
+    static QVector<ClientData> fromJSONArray(const QJsonArray &data);
     QJsonValue toJSON() const;
 
     /** Metadata about the client data. **/
