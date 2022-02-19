@@ -19,6 +19,15 @@
 
 namespace KGAPI2::People
 {
+
+struct CalendarUrlDefinition
+{
+    FieldMetadata metadata;
+    QString url;
+    QString type;
+    QString formattedType;
+};
+
 class CalendarUrl::Private : public QSharedData
 {
 public:
@@ -48,6 +57,15 @@ public:
 CalendarUrl::CalendarUrl()
     : d(new Private)
 {
+}
+
+CalendarUrl::CalendarUrl(const CalendarUrlDefinition &definition)
+    : d(new Private)
+{
+    d->metadata = definition.metadata;
+    d->url = definition.url;
+    d->type = definition.type;
+    d->formattedType = definition.formattedType;
 }
 
 CalendarUrl::CalendarUrl(const CalendarUrl &) = default;
@@ -100,8 +118,32 @@ QString CalendarUrl::formattedType() const
 
 CalendarUrl CalendarUrl::fromJSON(const QJsonObject &obj)
 {
-    Q_UNUSED(obj);
+    if(!obj.isEmpty()) {
+        CalendarUrlDefinition definition;
+
+        const auto metadata = obj.value(QStringLiteral("metadata")).toObject();
+        definition.metadata = FieldMetadata::fromJSON(metadata);
+        definition.url = obj.value(QStringLiteral("url")).toString();
+        definition.type = obj.value(QStringLiteral("type")).toString();
+        definition.formattedType = obj.value(QStringLiteral("formattedType")).toString();
+
+        return CalendarUrl(definition);
+    }
     return CalendarUrl();
+}
+
+QVector<CalendarUrl> CalendarUrl::fromJSONArray(const QJsonArray& data)
+{
+    QVector<CalendarUrl> calendarUrls;
+
+    for(const auto calendarUrl : data) {
+        if(calendarUrl.isObject()) {
+            const auto objectifiedCalendarUrl = calendarUrl.toObject();
+            calendarUrls.append(fromJSON(objectifiedCalendarUrl));
+        }
+    }
+
+    return calendarUrls;
 }
 
 QJsonValue CalendarUrl::toJSON() const

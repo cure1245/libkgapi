@@ -17,10 +17,12 @@
 
 class QJsonObject;
 class QJsonValue;
+class QJsonArray;
 
 namespace KGAPI2::People
 {
 class FieldMetadata;
+struct CalendarUrlDefinition;
 
 /**
  * A person's calendar URL.
@@ -33,6 +35,7 @@ class KGAPIPEOPLE_EXPORT CalendarUrl
 public:
     /** Constructs a new CalendarUrl **/
     explicit CalendarUrl();
+    CalendarUrl(const CalendarUrlDefinition &definition);
     CalendarUrl(const CalendarUrl &);
     CalendarUrl(CalendarUrl &&) noexcept;
     CalendarUrl &operator=(const CalendarUrl &);
@@ -43,7 +46,8 @@ public:
     bool operator==(const CalendarUrl &) const;
     bool operator!=(const CalendarUrl &) const;
 
-    static CalendarUrl fromJSON(const QJsonObject &);
+    static CalendarUrl fromJSON(const QJsonObject &obj);
+    static QVector<CalendarUrl> fromJSONArray(const QJsonArray &data);
     QJsonValue toJSON() const;
 
     /** The calendar URL. **/
