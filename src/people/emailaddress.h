@@ -17,10 +17,12 @@
 
 class QJsonObject;
 class QJsonValue;
+class QJsonArray;
 
 namespace KGAPI2::People
 {
 class FieldMetadata;
+struct EmailAddressDefinition;
 
 /**
  * A person's email address.
@@ -33,6 +35,7 @@ class KGAPIPEOPLE_EXPORT EmailAddress
 public:
     /** Constructs a new EmailAddress **/
     explicit EmailAddress();
+    EmailAddress(const EmailAddressDefinition &definition);
     EmailAddress(const EmailAddress &);
     EmailAddress(EmailAddress &&) noexcept;
     EmailAddress &operator=(const EmailAddress &);
@@ -43,7 +46,8 @@ public:
     bool operator==(const EmailAddress &) const;
     bool operator!=(const EmailAddress &) const;
 
-    static EmailAddress fromJSON(const QJsonObject &);
+    static EmailAddress fromJSON(const QJsonObject &obj);
+    static QVector<EmailAddress> fromJSONArray(const QJsonArray &data);
     QJsonValue toJSON() const;
 
     /** The email address. **/

@@ -19,6 +19,16 @@
 
 namespace KGAPI2::People
 {
+
+struct EmailAddressDefinition
+{
+    FieldMetadata metadata;
+    QString value;
+    QString type;
+    QString formattedType;
+    QString displayName;
+};
+
 class EmailAddress::Private : public QSharedData
 {
 public:
@@ -50,6 +60,16 @@ public:
 EmailAddress::EmailAddress()
     : d(new Private)
 {
+}
+
+EmailAddress::EmailAddress(const EmailAddressDefinition &definition)
+    : d(new Private)
+{
+    d->metadata = definition.metadata;
+    d->value = definition.value;
+    d->type = definition.type;
+    d->formattedType = definition.formattedType;
+    d->displayName = definition.displayName;
 }
 
 EmailAddress::EmailAddress(const EmailAddress &) = default;
@@ -111,9 +131,36 @@ QString EmailAddress::formattedType() const
 
 EmailAddress EmailAddress::fromJSON(const QJsonObject &obj)
 {
-    Q_UNUSED(obj);
+    if(!obj.isEmpty()) {
+        EmailAddressDefinition definition;
+
+        const auto metadata = obj.value(QStringLiteral("metadata")).toObject();
+        definition.metadata = FieldMetadata::fromJSON(metadata);
+        definition.value = obj.value(QStringLiteral("value")).toString();
+        definition.type = obj.value(QStringLiteral("type")).toString();
+        definition.formattedType = obj.value(QStringLiteral("formattedType")).toString();
+        definition.displayName = obj.value(QStringLiteral("displayName")).toString();
+
+        return EmailAddress(definition);
+    }
+
     return EmailAddress();
 }
+
+QVector<EmailAddress> EmailAddress::fromJSONArray(const QJsonArray& data)
+{
+    QVector<EmailAddress> emailAddresses;
+
+    for(const auto emailAddress : data) {
+        if(emailAddress.isObject()) {
+            const auto objectifiedEmailAddress = emailAddress.toObject();
+            emailAddresses.append(fromJSON(objectifiedEmailAddress));
+        }
+    }
+
+    return emailAddresses;
+}
+
 
 QJsonValue EmailAddress::toJSON() const
 {
