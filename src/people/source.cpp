@@ -19,6 +19,16 @@
 
 namespace KGAPI2::People
 {
+
+struct SourceDefinition
+{
+    Source::Type type;
+    QString id;
+    QString etag;
+    QString updateTime;
+    ProfileMetadata profileMetadata;
+};
+
 class Source::Private : public QSharedData
 {
 public:
@@ -49,6 +59,16 @@ public:
 Source::Source()
     : d(new Private)
 {
+}
+
+Source::Source(SourceDefinition definition)
+    : d(new Private)
+{
+    d->type = definition.type;
+    d->id = definition.id;
+    d->etag = definition.etag;
+    d->updateTime = definition.updateTime;
+    d->profileMetadata = definition.profileMetadata;
 }
 
 Source::Source(const Source &) = default;
@@ -105,7 +125,34 @@ void Source::setType(const Source::Type &value)
 
 Source Source::fromJSON(const QJsonObject &obj)
 {
-    Q_UNUSED(obj);
+    if(!obj.isEmpty()) {
+        SourceDefinition definition;
+
+        const auto typeEnumString = obj.value(QStringLiteral("type"));
+
+        if(typeEnumString == QStringLiteral("ACCOUNT")) {
+            definition.type = Type::ACCOUNT;
+        } else if(typeEnumString == QStringLiteral("PROFILE")) {
+            definition.type = Type::PROFILE;
+        } else if(typeEnumString == QStringLiteral("DOMAIN_PROFILE")) {
+            definition.type = Type::DOMAIN_PROFILE;
+        } else if(typeEnumString == QStringLiteral("CONTACT")) {
+            definition.type = Type::CONTACT;
+        } else if(typeEnumString == QStringLiteral("OTHER_CONTACT")) {
+            definition.type = Type::OTHER_CONTACT;
+        } else if(typeEnumString == QStringLiteral("DOMAIN_CONTACT")) {
+            definition.type = Type::DOMAIN_CONTACT;
+        } else {
+            definition.type = Type::SOURCE_TYPE_UNSPECIFIED;
+        }
+
+        definition.id = obj.value(QStringLiteral("id")).toString();
+        definition.etag = obj.value(QStringLiteral("etag")).toString();
+        definition.updateTime = obj.value(QStringLiteral("id")).toString();
+        definition.profileMetadata = ProfileMetadata::fromJSON(obj.value(QStringLiteral("profileMetadata")).toObject());
+
+        return Source(definition);
+    }
     return Source();
 }
 

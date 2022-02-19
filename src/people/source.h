@@ -21,6 +21,7 @@ class QJsonValue;
 namespace KGAPI2::People
 {
 class ProfileMetadata;
+struct SourceDefinition;
 
 /**
  * The source of a field.
@@ -45,6 +46,7 @@ public:
 
     /** Constructs a new Source **/
     explicit Source();
+    Source(SourceDefinition definition);
     Source(const Source &);
     Source(Source &&) noexcept;
     Source &operator=(const Source &);
