@@ -61,7 +61,7 @@ Source::Source()
 {
 }
 
-Source::Source(SourceDefinition definition)
+Source::Source(const SourceDefinition &definition)
     : d(new Private)
 {
     d->type = definition.type;

@@ -53,7 +53,7 @@ ProfileMetadata::ProfileMetadata()
 {
 }
 
-ProfileMetadata::ProfileMetadata(const ProfileMetadataDefinition definition)
+ProfileMetadata::ProfileMetadata(const ProfileMetadataDefinition &definition)
     : d(new Private)
 {
     d->objectType = definition.objectType;

@@ -46,7 +46,7 @@ public:
 
     /** Constructs a new Source **/
     explicit Source();
-    Source(SourceDefinition definition);
+    Source(const SourceDefinition &definition);
     Source(const Source &);
     Source(Source &&) noexcept;
     Source &operator=(const Source &);

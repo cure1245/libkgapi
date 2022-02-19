@@ -57,7 +57,7 @@ FieldMetadata::FieldMetadata()
 {
 }
 
-FieldMetadata::FieldMetadata(FieldMetadataDefinition definition)
+FieldMetadata::FieldMetadata(const FieldMetadataDefinition &definition)
     : d(new Private)
 {
     d->primary = definition.primary;

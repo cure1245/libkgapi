@@ -35,7 +35,7 @@ public:
     explicit FieldMetadata();
     FieldMetadata(const FieldMetadata &);
     FieldMetadata(FieldMetadata &&) noexcept;
-    FieldMetadata(FieldMetadataDefinition definition);
+    FieldMetadata(const FieldMetadataDefinition &definition);
     FieldMetadata &operator=(const FieldMetadata &);
     FieldMetadata &operator=(FieldMetadata &&) noexcept;
     /** Destructor. **/
