@@ -20,6 +20,9 @@ class QJsonValue;
 
 namespace KGAPI2::People
 {
+
+struct ProfileMetadataDefinition;
+
 /**
  * The metadata about a profile.
  *
@@ -44,6 +47,7 @@ public:
     /** Constructs a new ProfileMetadata **/
     explicit ProfileMetadata();
     ProfileMetadata(const ProfileMetadata &);
+    ProfileMetadata(const ProfileMetadataDefinition definition);
     ProfileMetadata(ProfileMetadata &&) noexcept;
     ProfileMetadata &operator=(const ProfileMetadata &);
     ProfileMetadata &operator=(ProfileMetadata &&) noexcept;

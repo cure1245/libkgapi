@@ -17,6 +17,13 @@
 
 namespace KGAPI2::People
 {
+
+struct ProfileMetadataDefinition
+{
+    ProfileMetadata::ObjectType objectType;
+    QVector<ProfileMetadata::UserTypes> userTypes;
+};
+
 class ProfileMetadata::Private : public QSharedData
 {
 public:
@@ -46,6 +53,13 @@ ProfileMetadata::ProfileMetadata()
 {
 }
 
+ProfileMetadata::ProfileMetadata(const ProfileMetadataDefinition definition)
+    : d(new Private)
+{
+    d->objectType = definition.objectType;
+    d->userTypes = definition.userTypes;
+}
+
 ProfileMetadata::ProfileMetadata(const ProfileMetadata &) = default;
 ProfileMetadata::ProfileMetadata(ProfileMetadata &&) noexcept = default;
 ProfileMetadata &ProfileMetadata::operator=(const ProfileMetadata &) = default;
@@ -73,7 +87,38 @@ ProfileMetadata::ProfileMetadata::ObjectType ProfileMetadata::objectType() const
 
 ProfileMetadata ProfileMetadata::fromJSON(const QJsonObject &obj)
 {
-    Q_UNUSED(obj);
+    if(!obj.isEmpty() && obj.value(QStringLiteral("userTypes")).isArray()) {
+        ProfileMetadataDefinition definition;
+
+        const auto objectTypeEnumString = obj.value(QStringLiteral("objectType"));
+        if(objectTypeEnumString == QStringLiteral("PERSON")) {
+            definition.objectType = ObjectType::PERSON;
+        } else if (objectTypeEnumString == QStringLiteral("PAGE")) {
+            definition.objectType = ObjectType::PAGE;
+        } else {
+            definition.objectType = ObjectType::OBJECT_TYPE_UNSPECIFIED;
+        }
+
+        if(obj.value(QStringLiteral("userTypes")).isArray()) {
+            const auto userTypesJsonArray = obj.value(QStringLiteral("userTypes")).toArray();
+
+            for(const auto userType : userTypesJsonArray) {
+                if(userType == obj.value(QStringLiteral("GOOGLE_USER"))) {
+                    definition.userTypes.append(UserTypes::GOOGLE_USER);
+                } else if(userType == obj.value(QStringLiteral("GPLUS_USER"))) {
+                    definition.userTypes.append(UserTypes::GPLUS_USER);
+                } else if(userType == obj.value(QStringLiteral("GOOGLE_APPS_USER"))) {
+                    definition.userTypes.append(UserTypes::GOOGLE_APPS_USER);
+                } else {
+                    definition.userTypes.append(UserTypes::USER_TYPE_UNKNOWN);
+                }
+            }
+        } else {
+            definition.userTypes.append(UserTypes::USER_TYPE_UNKNOWN);
+        }
+
+        return ProfileMetadata(definition);
+    }
     return ProfileMetadata();
 }
 
@@ -85,6 +130,7 @@ QJsonValue ProfileMetadata::toJSON() const
         QJsonArray arr;
         std::transform(d->userTypes.cbegin(), d->userTypes.cend(), std::back_inserter(arr), [](const auto &val) {
             switch (val) {
+            default:
             case UserTypes::USER_TYPE_UNKNOWN:
                 return QStringLiteral("USER_TYPE_UNKNOWN");
             case UserTypes::GOOGLE_USER:
