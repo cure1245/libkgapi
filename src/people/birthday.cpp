@@ -95,9 +95,38 @@ void Birthday::setDate(const QDate &value)
 
 Birthday Birthday::fromJSON(const QJsonObject &obj)
 {
-    Q_UNUSED(obj);
+    if(!obj.isEmpty()) {
+        Birthday birthday;
+
+        const auto jsonMetadata = obj.value(QStringLiteral("metadata")).toObject();
+        birthday.setMetadata(FieldMetadata::fromJSON(jsonMetadata));
+
+        const auto jsonDate = obj.value(QStringLiteral("date")).toObject();
+        const auto year = jsonDate.value(QStringLiteral("year")).toInt();
+        const auto month = jsonDate.value(QStringLiteral("month")).toInt();
+        const auto day = jsonDate.value(QStringLiteral("day")).toInt();
+        QDate date(year, month, day);
+        birthday.setDate(date);
+
+        return birthday;
+    }
     return Birthday();
 }
+
+QVector<Birthday> Birthday::fromJSONArray(const QJsonArray &data)
+{
+    QVector<Birthday> birthdays;
+
+    for(const auto birthday : data) {
+        if(birthday.isObject()) {
+            const auto objectifiedBirthday = birthday.toObject();
+            birthdays.append(fromJSON(objectifiedBirthday));
+        }
+    }
+
+    return birthdays;
+}
+
 
 QJsonValue Birthday::toJSON() const
 {

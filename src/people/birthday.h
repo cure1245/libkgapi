@@ -18,6 +18,7 @@
 
 class QJsonObject;
 class QJsonValue;
+class QJsonArray;
 
 namespace KGAPI2::People
 {
@@ -46,7 +47,8 @@ public:
     bool operator==(const Birthday &) const;
     bool operator!=(const Birthday &) const;
 
-    static Birthday fromJSON(const QJsonObject &);
+    static Birthday fromJSON(const QJsonObject &obj);
+    static QVector<Birthday> fromJSONArray(const QJsonArray &data);
     QJsonValue toJSON() const;
 
     /** A free-form string representing the user's birthday. **/
