@@ -19,6 +19,15 @@
 
 namespace KGAPI2::People
 {
+
+struct EventDefinition
+{
+    FieldMetadata metadata;
+    QDate date;
+    QString type;
+    QString formattedType;
+};
+
 class Event::Private : public QSharedData
 {
 public:
@@ -48,6 +57,15 @@ public:
 Event::Event()
     : d(new Private)
 {
+}
+
+Event::Event(const EventDefinition &definition)
+    : d(new Private)
+{
+    d->metadata = definition.metadata;
+    d->date = definition.date;
+    d->type = definition.type;
+    d->formattedType = definition.formattedType;
 }
 
 Event::Event(const Event &) = default;
@@ -100,8 +118,39 @@ QString Event::formattedType() const
 
 Event Event::fromJSON(const QJsonObject &obj)
 {
-    Q_UNUSED(obj);
+    if(!obj.isEmpty()) {
+        EventDefinition definition;
+
+        const auto metadata = obj.value(QStringLiteral("metadata")).toObject();
+        definition.metadata = FieldMetadata::fromJSON(metadata);
+
+        const auto jsonDate = obj.value(QStringLiteral("date")).toObject();
+        const auto year = jsonDate.value(QStringLiteral("year")).toInt();
+        const auto month = jsonDate.value(QStringLiteral("month")).toInt();
+        const auto day = jsonDate.value(QStringLiteral("day")).toInt();
+        definition.date = QDate(year, month, day);
+
+        definition.type = obj.value(QStringLiteral("type")).toString();
+        definition.formattedType = obj.value(QStringLiteral("formattedType")).toString();
+
+        return Event(definition);
+    }
+
     return Event();
+}
+
+QVector<Event> Event::fromJSONArray(const QJsonArray& data)
+{
+    QVector<Event> events;
+
+    for(const auto event : data) {
+        if(event.isObject()) {
+            const auto objectifiedEvent = event.toObject();
+            events.append(fromJSON(objectifiedEvent));
+        }
+    }
+
+    return events;
 }
 
 QJsonValue Event::toJSON() const

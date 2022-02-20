@@ -18,10 +18,12 @@
 
 class QJsonObject;
 class QJsonValue;
+class QJsonArray;
 
 namespace KGAPI2::People
 {
 class FieldMetadata;
+struct EventDefinition;
 
 /**
  * An event related to the person.
@@ -34,6 +36,7 @@ class KGAPIPEOPLE_EXPORT Event
 public:
     /** Constructs a new Event **/
     explicit Event();
+    Event(const EventDefinition &definition);
     Event(const Event &);
     Event(Event &&) noexcept;
     Event &operator=(const Event &);
@@ -44,7 +47,8 @@ public:
     bool operator==(const Event &) const;
     bool operator!=(const Event &) const;
 
-    static Event fromJSON(const QJsonObject &);
+    static Event fromJSON(const QJsonObject &obj);
+    static QVector<Event> fromJSONArray(const QJsonArray &data);
     QJsonValue toJSON() const;
 
     /** Metadata about the event. **/
