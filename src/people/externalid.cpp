@@ -19,6 +19,14 @@
 
 namespace KGAPI2::People
 {
+
+struct ExternalIdDefinition {
+    FieldMetadata metadata;
+    QString value;
+    QString type;
+    QString formattedType;
+};
+
 class ExternalId::Private : public QSharedData
 {
 public:
@@ -48,6 +56,15 @@ public:
 ExternalId::ExternalId()
     : d(new Private)
 {
+}
+
+ExternalId::ExternalId(const ExternalIdDefinition &definition)
+    : d(new Private)
+{
+    d->metadata = definition.metadata;
+    d->value = definition.value;
+    d->type = definition.type;
+    d->formattedType = definition.formattedType;
 }
 
 ExternalId::ExternalId(const ExternalId &) = default;
@@ -100,8 +117,33 @@ void ExternalId::setMetadata(const FieldMetadata &value)
 
 ExternalId ExternalId::fromJSON(const QJsonObject &obj)
 {
-    Q_UNUSED(obj);
+    if(!obj.isEmpty()) {
+        ExternalIdDefinition definition;
+
+        const auto metadata = obj.value(QStringLiteral("metadata")).toObject();
+        definition.metadata = FieldMetadata::fromJSON(metadata);
+        definition.value = obj.value(QStringLiteral("value")).toString();
+        definition.type = obj.value(QStringLiteral("type")).toString();
+        definition.formattedType = obj.value(QStringLiteral("formattedType")).toString();
+
+        return ExternalId(definition);
+    }
+
     return ExternalId();
+}
+
+QVector<ExternalId> ExternalId::fromJSONArray(const QJsonArray& data)
+{
+    QVector<ExternalId> externalIds;
+
+    for(const auto externalId : data) {
+        if(externalId.isObject()) {
+            const auto objectifiedExternalId = externalId.toObject();
+            externalIds.append(fromJSON(objectifiedExternalId));
+        }
+    }
+
+    return externalIds;
 }
 
 QJsonValue ExternalId::toJSON() const

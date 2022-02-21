@@ -17,10 +17,12 @@
 
 class QJsonObject;
 class QJsonValue;
+class QJsonArray;
 
 namespace KGAPI2::People
 {
 class FieldMetadata;
+class ExternalIdDefinition;
 
 /**
  * An identifier from an external entity related to the person.
@@ -33,6 +35,7 @@ class KGAPIPEOPLE_EXPORT ExternalId
 public:
     /** Constructs a new ExternalId **/
     explicit ExternalId();
+    ExternalId(const ExternalIdDefinition &definition);
     ExternalId(const ExternalId &);
     ExternalId(ExternalId &&) noexcept;
     ExternalId &operator=(const ExternalId &);
@@ -43,7 +46,8 @@ public:
     bool operator==(const ExternalId &) const;
     bool operator!=(const ExternalId &) const;
 
-    static ExternalId fromJSON(const QJsonObject &);
+    static ExternalId fromJSON(const QJsonObject &obj);
+    static QVector<ExternalId> fromJSONArray(const QJsonArray &data);
     QJsonValue toJSON() const;
 
     /** The type of the external ID. The type can be custom or one of these predefined values: * `account` * `customer` * `loginId` * `network` * `organization`
