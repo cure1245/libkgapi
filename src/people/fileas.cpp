@@ -85,8 +85,31 @@ void FileAs::setValue(const QString &value)
 
 FileAs FileAs::fromJSON(const QJsonObject &obj)
 {
-    Q_UNUSED(obj);
+    if(!obj.isEmpty()) {
+        FileAs fileAs;
+
+        const auto metadata = obj.value(QStringLiteral("metadata")).toObject();
+        fileAs.setMetadata(FieldMetadata::fromJSON(metadata));
+        fileAs.setValue(obj.value(QStringLiteral("value")).toString());
+
+        return fileAs;
+    }
+
     return FileAs();
+}
+
+QVector<FileAs> FileAs::fromJSONArray(const QJsonArray& data)
+{
+    QVector<FileAs> fileAses;
+
+    for(const auto fileAs : data) {
+        if(fileAs.isObject()) {
+            const auto objectifiedFileAs = fileAs.toObject();
+            fileAses.append(fromJSON(objectifiedFileAs));
+        }
+    }
+
+    return fileAses;
 }
 
 QJsonValue FileAs::toJSON() const
