@@ -17,10 +17,12 @@
 
 class QJsonObject;
 class QJsonValue;
+class QJsonArray;
 
 namespace KGAPI2::People
 {
 class FieldMetadata;
+struct GenderDefinition;
 
 /**
  * A person's gender.
@@ -33,6 +35,7 @@ class KGAPIPEOPLE_EXPORT Gender
 public:
     /** Constructs a new Gender **/
     explicit Gender();
+    Gender(const GenderDefinition &definition);
     Gender(const Gender &);
     Gender(Gender &&) noexcept;
     Gender &operator=(const Gender &);
@@ -44,6 +47,7 @@ public:
     bool operator!=(const Gender &) const;
 
     static Gender fromJSON(const QJsonObject &);
+    static QVector<Gender> fromJSONArray(const QJsonArray& data);
     QJsonValue toJSON() const;
 
     /** Metadata about the gender. **/

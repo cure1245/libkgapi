@@ -19,6 +19,15 @@
 
 namespace KGAPI2::People
 {
+
+struct GenderDefinition
+{
+    FieldMetadata metadata;
+    QString value;
+    QString formattedValue;
+    QString addressMeAs;
+};
+
 class Gender::Private : public QSharedData
 {
 public:
@@ -48,6 +57,12 @@ public:
 Gender::Gender()
     : d(new Private)
 {
+}
+
+Gender::Gender(const GenderDefinition &definition)
+    : d(new Private)
+{
+
 }
 
 Gender::Gender(const Gender &) = default;
@@ -100,8 +115,32 @@ void Gender::setAddressMeAs(const QString &value)
 
 Gender Gender::fromJSON(const QJsonObject &obj)
 {
-    Q_UNUSED(obj);
+    if(!obj.isEmpty()) {
+        GenderDefinition definition;
+
+        const auto metadata = obj.value(QStringLiteral("metadata")).toObject();
+        definition.metadata = FieldMetadata::fromJSON(metadata);
+        definition.value = obj.value(QStringLiteral("value")).toString();
+        definition.formattedValue = obj.value(QStringLiteral("formattedValue")).toString();
+        definition.addressMeAs = obj.value(QStringLiteral("addressMeAs")).toString();
+
+        return Gender(definition);
+    }
     return Gender();
+}
+
+QVector<Gender> Gender::fromJSONArray(const QJsonArray& data)
+{
+    QVector<Gender> genders;
+
+    for(const auto gender : data) {
+        if(gender.isObject()) {
+            const auto objectifiedGender = gender.toObject();
+            genders.append(fromJSON(objectifiedGender));
+        }
+    }
+
+    return genders;
 }
 
 QJsonValue Gender::toJSON() const
