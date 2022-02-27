@@ -85,8 +85,31 @@ void Interest::setMetadata(const FieldMetadata &value)
 
 Interest Interest::fromJSON(const QJsonObject &obj)
 {
-    Q_UNUSED(obj);
+    if(!obj.isEmpty()) {
+        Interest interest;
+
+        const auto metadata = obj.value(QStringLiteral("metadata")).toObject();
+        interest.setMetadata(FieldMetadata::fromJSON(metadata));
+        interest.setValue(obj.value(QStringLiteral("value")).toString());
+
+        return interest;
+    }
+
     return Interest();
+}
+
+QVector<Interest> Interest::fromJSONArray(const QJsonArray& data)
+{
+    QVector<Interest> interests;
+
+    for(const auto interest : data) {
+        if(interest.isObject()) {
+            const auto objectifiedInterest = interest.toObject();
+            interests.append(fromJSON(objectifiedInterest));
+        }
+    }
+
+    return interests;
 }
 
 QJsonValue Interest::toJSON() const
