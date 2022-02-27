@@ -19,6 +19,16 @@
 
 namespace KGAPI2::People
 {
+
+struct ImClientDefinition {
+    FieldMetadata metadata;
+    QString username;
+    QString type;
+    QString formattedType;
+    QString protocol;
+    QString formattedProtocol;
+};
+
 class ImClient::Private : public QSharedData
 {
 public:
@@ -51,6 +61,17 @@ public:
 ImClient::ImClient()
     : d(new Private)
 {
+}
+
+ImClient::ImClient(const ImClientDefinition &definition)
+    : d(new Private)
+{
+    d->metadata = definition.metadata;
+    d->username = definition.username;
+    d->type = definition.type;
+    d->formattedType = definition.formattedType;
+    d->protocol = definition.protocol;
+    d->formattedProtocol = definition.formattedProtocol;
 }
 
 ImClient::ImClient(const ImClient &) = default;
@@ -116,8 +137,34 @@ QString ImClient::formattedProtocol() const
 
 ImClient ImClient::fromJSON(const QJsonObject &obj)
 {
-    Q_UNUSED(obj);
+    if(!obj.isEmpty()) {
+        ImClientDefinition definition;
+
+        const auto metadata = obj.value(QStringLiteral("metadata")).toObject();
+        definition.metadata = FieldMetadata::fromJSON(metadata);
+        definition.username = obj.value(QStringLiteral("username")).toString();
+        definition.type = obj.value(QStringLiteral("type")).toString();
+        definition.formattedType = obj.value(QStringLiteral("formattedType")).toString();
+        definition.protocol = obj.value(QStringLiteral("protocol")).toString();
+        definition.formattedProtocol = obj.value(QStringLiteral("formattedProtocol")).toString();
+
+        return ImClient(definition);
+    }
     return ImClient();
+}
+
+QVector<ImClient> ImClient::fromJSONArray(const QJsonArray& data)
+{
+    QVector<ImClient> imClients;
+
+    for(const auto imClient : data) {
+        if(imClient.isObject()) {
+            const auto objectifiedImClient = imClient.toObject();
+            imClients.append(fromJSON(objectifiedImClient));
+        }
+    }
+
+    return imClients;
 }
 
 QJsonValue ImClient::toJSON() const

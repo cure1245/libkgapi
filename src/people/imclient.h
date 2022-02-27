@@ -17,10 +17,12 @@
 
 class QJsonObject;
 class QJsonValue;
+class QJsonArray;
 
 namespace KGAPI2::People
 {
 class FieldMetadata;
+struct ImClientDefinition;
 
 /**
  * A person's instant messaging client.
@@ -33,6 +35,7 @@ class KGAPIPEOPLE_EXPORT ImClient
 public:
     /** Constructs a new ImClient **/
     explicit ImClient();
+    ImClient(const ImClientDefinition &definition);
     ImClient(const ImClient &);
     ImClient(ImClient &&) noexcept;
     ImClient &operator=(const ImClient &);
@@ -44,6 +47,7 @@ public:
     bool operator!=(const ImClient &) const;
 
     static ImClient fromJSON(const QJsonObject &);
+    static QVector<ImClient> fromJSONArray(const QJsonArray& data);
     QJsonValue toJSON() const;
 
     /** The protocol of the IM client. The protocol can be custom or one of these predefined values: * `aim` * `msn` * `yahoo` * `skype` * `qq` * `googleTalk` *
