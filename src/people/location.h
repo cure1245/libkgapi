@@ -17,6 +17,7 @@
 
 class QJsonObject;
 class QJsonValue;
+class QJsonArray;
 
 namespace KGAPI2::People
 {
@@ -44,6 +45,7 @@ public:
     bool operator!=(const Location &) const;
 
     static Location fromJSON(const QJsonObject &);
+    static QVector<Location> fromJSONArray(const QJsonArray& data);
     QJsonValue toJSON() const;
 
     /** The individual desk location. **/

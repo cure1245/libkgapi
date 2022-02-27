@@ -19,6 +19,7 @@
 
 namespace KGAPI2::People
 {
+
 class Location::Private : public QSharedData
 {
 public:
@@ -146,8 +147,37 @@ void Location::setFloorSection(const QString &value)
 
 Location Location::fromJSON(const QJsonObject &obj)
 {
-    Q_UNUSED(obj);
+    if(!obj.isEmpty()) {
+        Location location;
+
+        const auto metadata = obj.value(QStringLiteral("metadata")).toObject();
+        location.setMetadata(FieldMetadata::fromJSON(metadata));
+        location.setValue(obj.value(QStringLiteral("value")).toString());
+        location.setType(obj.value(QStringLiteral("type")).toString());
+        location.setCurrent(obj.value(QStringLiteral("current")).toBool());
+        location.setBuildingId(obj.value(QStringLiteral("buildingId")).toString());
+        location.setFloor(obj.value(QStringLiteral("floor")).toString());
+        location.setFloorSection(obj.value(QStringLiteral("floorSection")).toString());
+        location.setDeskCode(obj.value(QStringLiteral("deskCode")).toString());
+
+        return location;
+    }
+
     return Location();
+}
+
+QVector<Location> Location::fromJSONArray(const QJsonArray& data)
+{
+    QVector<Location> locations;
+
+    for(const auto location : data) {
+        if(location.isObject()) {
+            const auto objectifiedLocation = location.toObject();
+            locations.append(fromJSON(objectifiedLocation));
+        }
+    }
+
+    return locations;
 }
 
 QJsonValue Location::toJSON() const
