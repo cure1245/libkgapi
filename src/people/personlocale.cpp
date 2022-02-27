@@ -85,8 +85,31 @@ void PersonLocale::setValue(const QString &value)
 
 PersonLocale PersonLocale::fromJSON(const QJsonObject &obj)
 {
-    Q_UNUSED(obj);
+    if(!obj.isEmpty()) {
+        PersonLocale locale;
+
+        const auto metadata = obj.value(QStringLiteral("metadata")).toObject();
+        locale.setMetadata(FieldMetadata::fromJSON(metadata));
+        locale.setValue(obj.value(QStringLiteral("value")).toString());
+
+        return locale;
+    }
+
     return PersonLocale();
+}
+
+QVector<PersonLocale> PersonLocale::fromJSONArray(const QJsonArray& data)
+{
+    QVector<PersonLocale> locales;
+
+    for(const auto locale : data) {
+        if(locale.isObject()) {
+            const auto objectifiedLocale = locale.toObject();
+            locales.append(fromJSON(objectifiedLocale));
+        }
+    }
+
+    return locales;
 }
 
 QJsonValue PersonLocale::toJSON() const
