@@ -15,12 +15,14 @@
 
 class QJsonObject;
 class QJsonValue;
+class QJsonArray;
 
 namespace KGAPI2::People
 {
 class ContactGroupMembership;
 class DomainMembership;
 class FieldMetadata;
+struct MembershipDefinition;
 
 /**
  * A person's membership in a group. Only contact group memberships can be
@@ -34,6 +36,7 @@ class KGAPIPEOPLE_EXPORT Membership
 public:
     /** Constructs a new Membership **/
     explicit Membership();
+    Membership(const MembershipDefinition &definition);
     Membership(const Membership &);
     Membership(Membership &&) noexcept;
     Membership &operator=(const Membership &);
@@ -44,7 +47,8 @@ public:
     bool operator==(const Membership &) const;
     bool operator!=(const Membership &) const;
 
-    static Membership fromJSON(const QJsonObject &);
+    static Membership fromJSON(const QJsonObject &obj);
+    static QVector<Membership> fromJSONArray(const QJsonArray& data);
     QJsonValue toJSON() const;
 
     /** Output only. The domain membership. **/

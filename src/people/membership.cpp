@@ -21,6 +21,14 @@
 
 namespace KGAPI2::People
 {
+
+struct MembershipDefinition
+{
+    FieldMetadata metadata;
+    ContactGroupMembership contactGroupMembership;
+    DomainMembership domainMembership;
+};
+
 class Membership::Private : public QSharedData
 {
 public:
@@ -49,6 +57,14 @@ public:
 Membership::Membership()
     : d(new Private)
 {
+}
+
+Membership::Membership(const MembershipDefinition &definition)
+    : d(new Private)
+{
+    d->metadata = definition.metadata;
+    d->contactGroupMembership = definition.contactGroupMembership;
+    d->domainMembership = definition.domainMembership;
 }
 
 Membership::Membership(const Membership &) = default;
@@ -92,8 +108,36 @@ void Membership::setMetadata(const FieldMetadata &value)
 
 Membership Membership::fromJSON(const QJsonObject &obj)
 {
-    Q_UNUSED(obj);
+    if(!obj.isEmpty()) {
+        MembershipDefinition definition;
+
+        const auto metadata = obj.value(QStringLiteral("metadata")).toObject();
+        definition.metadata = FieldMetadata::fromJSON(metadata);
+
+        const auto contactGroupMembership = obj.value(QStringLiteral("contactGroupMembership")).toObject();
+        definition.contactGroupMembership = ContactGroupMembership::fromJSON(contactGroupMembership);
+
+        const auto domainMembership = obj.value(QStringLiteral("domainMembership")).toObject();
+        definition.domainMembership = DomainMembership::fromJSON(domainMembership);
+
+        return Membership(definition);
+    }
+
     return Membership();
+}
+
+QVector<Membership> Membership::fromJSONArray(const QJsonArray& data)
+{
+    QVector<Membership> memberships;
+
+    for(const auto membership : data) {
+        if(membership.isObject()) {
+            const auto objectifiedMembership = membership.toObject();
+            memberships.append(fromJSON(objectifiedMembership));
+        }
+    }
+
+    return memberships;
 }
 
 QJsonValue Membership::toJSON() const

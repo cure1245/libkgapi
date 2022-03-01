@@ -73,7 +73,13 @@ void DomainMembership::setInViewerDomain(const bool &value)
 
 DomainMembership DomainMembership::fromJSON(const QJsonObject &obj)
 {
-    Q_UNUSED(obj);
+    if(!obj.isEmpty()) {
+        DomainMembership domainMembership;
+
+        domainMembership.setInViewerDomain(obj.value(QStringLiteral("inViewerDomain")).toBool());
+
+        return domainMembership;
+    }
     return DomainMembership();
 }
 

@@ -20,6 +20,9 @@ class QJsonValue;
 
 namespace KGAPI2::People
 {
+
+struct ContactGroupMembershipDefinition;
+
 /**
  * A Google contact group membership.
  *
@@ -31,6 +34,7 @@ class KGAPIPEOPLE_EXPORT ContactGroupMembership
 public:
     /** Constructs a new ContactGroupMembership **/
     explicit ContactGroupMembership();
+    ContactGroupMembership(const ContactGroupMembershipDefinition &definition);
     ContactGroupMembership(const ContactGroupMembership &);
     ContactGroupMembership(ContactGroupMembership &&) noexcept;
     ContactGroupMembership &operator=(const ContactGroupMembership &);

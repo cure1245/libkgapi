@@ -17,6 +17,13 @@
 
 namespace KGAPI2::People
 {
+
+struct ContactGroupMembershipDefinition
+{
+    QString contactGroupId;
+    QString contactGroupResourceName;
+};
+
 class ContactGroupMembership::Private : public QSharedData
 {
 public:
@@ -78,7 +85,15 @@ QString ContactGroupMembership::contactGroupId() const
 
 ContactGroupMembership ContactGroupMembership::fromJSON(const QJsonObject &obj)
 {
-    Q_UNUSED(obj);
+    if(!obj.isEmpty()) {
+        ContactGroupMembershipDefinition definition;
+
+        definition.contactGroupId = obj.value(QStringLiteral("contactGroupId")).toString();
+        definition.contactGroupResourceName = obj.value(QStringLiteral("contactGroupResourceName")).toString();
+
+        return ContactGroupMembership(definition);
+    }
+
     return ContactGroupMembership();
 }
 
