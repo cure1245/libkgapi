@@ -53,6 +53,13 @@ ContactGroupMembership::ContactGroupMembership()
 {
 }
 
+ContactGroupMembership::ContactGroupMembership(const ContactGroupMembershipDefinition &definition)
+    : d(new Private)
+{
+    d->contactGroupId = definition.contactGroupId;
+    d->contactGroupResourceName = definition.contactGroupResourceName;
+}
+
 ContactGroupMembership::ContactGroupMembership(const ContactGroupMembership &) = default;
 ContactGroupMembership::ContactGroupMembership(ContactGroupMembership &&) noexcept = default;
 ContactGroupMembership &ContactGroupMembership::operator=(const ContactGroupMembership &) = default;
