@@ -19,6 +19,15 @@
 
 namespace KGAPI2::People
 {
+
+struct MiscKeywordDefinition
+{
+    FieldMetadata metadata;
+    QString value;
+    MiscKeyword::Type type;
+    QString formattedType;
+};
+
 class MiscKeyword::Private : public QSharedData
 {
 public:
@@ -48,6 +57,15 @@ public:
 MiscKeyword::MiscKeyword()
     : d(new Private)
 {
+}
+
+MiscKeyword::MiscKeyword(const MiscKeywordDefinition &definition)
+    : d(new Private)
+{
+    d->metadata = definition.metadata;
+    d->value = definition.value;
+    d->type = definition.type;
+    d->formattedType = definition.formattedType;
 }
 
 MiscKeyword::MiscKeyword(const MiscKeyword &) = default;
@@ -100,8 +118,59 @@ QString MiscKeyword::formattedType() const
 
 MiscKeyword MiscKeyword::fromJSON(const QJsonObject &obj)
 {
-    Q_UNUSED(obj);
+    if(!obj.isEmpty()) {
+        MiscKeywordDefinition definition;
+
+        const auto metadata = obj.value(QStringLiteral("metadata")).toObject();
+        definition.metadata = FieldMetadata::fromJSON(metadata);
+        definition.value = obj.value(QStringLiteral("value")).toString();
+
+        const auto type = obj.value(QStringLiteral("type")).toString();
+        if(type == QStringLiteral("OUTLOOK_BILLING_INFORMATION")) {
+            definition.type = Type::OUTLOOK_BILLING_INFORMATION;
+        } else if(type == QStringLiteral("OUTLOOK_DIRECTORY_SERVER")) {
+            definition.type = Type::OUTLOOK_DIRECTORY_SERVER;
+        } else if(type == QStringLiteral("OUTLOOK_KEYWORD")) {
+            definition.type = Type::OUTLOOK_KEYWORD;
+        } else if(type == QStringLiteral("OUTLOOK_MILEAGE")) {
+            definition.type = Type::OUTLOOK_MILEAGE;
+        } else if(type == QStringLiteral("OUTLOOK_PRIORITY")) {
+            definition.type = Type::OUTLOOK_PRIORITY;
+        } else if(type == QStringLiteral("OUTLOOK_SENSITIVITY")) {
+            definition.type = Type::OUTLOOK_SENSITIVITY;
+        } else if(type == QStringLiteral("OUTLOOK_SUBJECT")) {
+            definition.type = Type::OUTLOOK_SUBJECT;
+        } else if(type == QStringLiteral("OUTLOOK_USER")) {
+            definition.type = Type::OUTLOOK_USER;
+        } else if(type == QStringLiteral("HOME")) {
+            definition.type = Type::HOME;
+        } else if(type == QStringLiteral("WORK")) {
+            definition.type = Type::WORK;
+        } else if(type == QStringLiteral("OTHER")) {
+            definition.type = Type::OTHER;
+        } else {
+            definition.type = Type::TYPE_UNSPECIFIED;
+        }
+
+        definition.formattedType = obj.value(QStringLiteral("formattedType")).toString();
+
+        return MiscKeyword(definition);
+    }
     return MiscKeyword();
+}
+
+QVector<MiscKeyword> MiscKeyword::fromJSONArray(const QJsonArray& data)
+{
+    QVector<MiscKeyword> miscKeywords;
+
+    for(const auto miscKeyword : data) {
+        if(miscKeyword.isObject()) {
+            const auto objectifiedMiscKeyword = miscKeyword.toObject();
+            miscKeywords.append(fromJSON(objectifiedMiscKeyword));
+        }
+    }
+
+    return miscKeywords;
 }
 
 QJsonValue MiscKeyword::toJSON() const

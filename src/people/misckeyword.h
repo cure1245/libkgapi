@@ -17,10 +17,12 @@
 
 class QJsonObject;
 class QJsonValue;
+class QJsonArray;
 
 namespace KGAPI2::People
 {
 class FieldMetadata;
+struct MiscKeywordDefinition;
 
 /**
  * A person's miscellaneous keyword.
@@ -48,6 +50,7 @@ public:
 
     /** Constructs a new MiscKeyword **/
     explicit MiscKeyword();
+    MiscKeyword(const MiscKeywordDefinition &definition);
     MiscKeyword(const MiscKeyword &);
     MiscKeyword(MiscKeyword &&) noexcept;
     MiscKeyword &operator=(const MiscKeyword &);
@@ -59,6 +62,7 @@ public:
     bool operator!=(const MiscKeyword &) const;
 
     static MiscKeyword fromJSON(const QJsonObject &);
+    static QVector<MiscKeyword> fromJSONArray(const QJsonArray& data);
     QJsonValue toJSON() const;
 
     /** Metadata about the miscellaneous keyword. **/
