@@ -19,6 +19,26 @@
 
 namespace KGAPI2::People
 {
+
+struct NameDefinition
+{
+    FieldMetadata metadata;
+    QString displayName;
+    QString displayNameLastFirst;
+    QString unstructuredName;
+    QString familyName;
+    QString givenName;
+    QString middleName;
+    QString honorificPrefix;
+    QString honorificSuffix;
+    QString phoneticFullName;
+    QString phoneticFamilyName;
+    QString phoneticGivenName;
+    QString phoneticMiddleName;
+    QString phoneticHonorificPrefix;
+    QString phoneticHonorificSuffix;
+};
+
 class Name::Private : public QSharedData
 {
 public:
@@ -63,6 +83,26 @@ public:
 Name::Name()
     : d(new Private)
 {
+}
+
+Name::Name(const NameDefinition &definition)
+    : d(new Private)
+{
+    d->metadata = definition.metadata;
+    d->displayName = definition.displayName;
+    d->displayNameLastFirst = definition.displayNameLastFirst;
+    d->unstructuredName = definition.unstructuredName;
+    d->familyName = definition.familyName;
+    d->givenName = definition.givenName;
+    d->middleName = definition.middleName;
+    d->honorificPrefix = definition.honorificPrefix;
+    d->honorificSuffix = definition.honorificSuffix;
+    d->phoneticFullName = definition.phoneticFamilyName;
+    d->phoneticFamilyName = definition.phoneticFamilyName;
+    d->phoneticGivenName = definition.phoneticGivenName;
+    d->phoneticMiddleName = definition.phoneticMiddleName;
+    d->phoneticHonorificPrefix = definition.phoneticHonorificPrefix;
+    d->phoneticHonorificSuffix = definition.phoneticHonorificSuffix;
 }
 
 Name::Name(const Name &) = default;
@@ -209,8 +249,44 @@ void Name::setMetadata(const FieldMetadata &value)
 
 Name Name::fromJSON(const QJsonObject &obj)
 {
-    Q_UNUSED(obj);
+    if(!obj.isEmpty()) {
+        NameDefinition definition;
+
+        const auto metadata = obj.value(QStringLiteral("metadata")).toObject();
+        definition.metadata = FieldMetadata::fromJSON(metadata);
+        definition.displayName = obj.value(QStringLiteral("displayName")).toString();
+        definition.displayNameLastFirst = obj.value(QStringLiteral("displayNameLastFirst")).toString();
+        definition.unstructuredName = obj.value(QStringLiteral("unstructuredName")).toString();
+        definition.familyName = obj.value(QStringLiteral("familyName")).toString();
+        definition.givenName = obj.value(QStringLiteral("givenName")).toString();
+        definition.middleName = obj.value(QStringLiteral("middleName")).toString();
+        definition.honorificPrefix = obj.value(QStringLiteral("honorificPrefix")).toString();
+        definition.honorificSuffix = obj.value(QStringLiteral("honorificSuffix")).toString();
+        definition.phoneticFullName = obj.value(QStringLiteral("phoneticFullName")).toString();
+        definition.phoneticFamilyName = obj.value(QStringLiteral("phoneticFamilyName")).toString();
+        definition.phoneticGivenName = obj.value(QStringLiteral("phoneticGivenName")).toString();
+        definition.phoneticMiddleName = obj.value(QStringLiteral("phoneticMiddleName")).toString();
+        definition.phoneticHonorificPrefix = obj.value(QStringLiteral("phoneticHonorificPrefix")).toString();
+        definition.phoneticHonorificSuffix = obj.value(QStringLiteral("phoneticHonorificSuffix")).toString();
+
+        return Name(definition);
+    }
+
     return Name();
+}
+
+QVector<Name> Name::fromJSONArray(const QJsonArray& data)
+{
+    QVector<Name> names;
+
+    for(const auto name : data) {
+        if(name.isObject()) {
+            const auto objectifiedName = name.toObject();
+            names.append(fromJSON(objectifiedName));
+        }
+    }
+
+    return names;
 }
 
 QJsonValue Name::toJSON() const

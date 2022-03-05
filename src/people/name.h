@@ -17,10 +17,12 @@
 
 class QJsonObject;
 class QJsonValue;
+class QJsonArray;
 
 namespace KGAPI2::People
 {
 class FieldMetadata;
+struct NameDefinition;
 
 /**
  * A person's name. If the name is a mononym, the family name is empty.
@@ -33,6 +35,7 @@ class KGAPIPEOPLE_EXPORT Name
 public:
     /** Constructs a new Name **/
     explicit Name();
+    Name(const NameDefinition &definition);
     Name(const Name &);
     Name(Name &&) noexcept;
     Name &operator=(const Name &);
@@ -44,6 +47,7 @@ public:
     bool operator!=(const Name &) const;
 
     static Name fromJSON(const QJsonObject &);
+    static QVector<Name> fromJSONArray(const QJsonArray& data);
     QJsonValue toJSON() const;
 
     /** The free form name value. **/
