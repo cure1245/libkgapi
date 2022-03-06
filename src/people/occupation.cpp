@@ -85,8 +85,30 @@ void Occupation::setMetadata(const FieldMetadata &value)
 
 Occupation Occupation::fromJSON(const QJsonObject &obj)
 {
-    Q_UNUSED(obj);
+    if(!obj.isEmpty()) {
+        Occupation occupation;
+
+        const auto metadata = obj.value(QStringLiteral("metadata")).toObject();
+        occupation.setMetadata(FieldMetadata::fromJSON(metadata));
+        occupation.setValue(obj.value(QStringLiteral("value")).toString());
+
+        return occupation;
+    }
     return Occupation();
+}
+
+QVector<Occupation> Occupation::fromJSONArray(const QJsonArray& data)
+{
+    QVector<Occupation> occupations;
+
+    for(const auto occupation : data) {
+        if(occupation.isObject()) {
+            const auto objectifiedOccupation = occupation.toObject();
+            occupations.append(fromJSON(objectifiedOccupation));
+        }
+    }
+
+    return occupations;
 }
 
 QJsonValue Occupation::toJSON() const
