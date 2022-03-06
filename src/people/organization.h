@@ -18,10 +18,12 @@
 
 class QJsonObject;
 class QJsonValue;
+class QJsonArray;
 
 namespace KGAPI2::People
 {
 class FieldMetadata;
+struct OrganizationDefinition;
 
 /**
  * A person's past or current organization. Overlapping date ranges are permitted.
@@ -34,6 +36,7 @@ class KGAPIPEOPLE_EXPORT Organization
 public:
     /** Constructs a new Organization **/
     explicit Organization();
+    Organization(const OrganizationDefinition &definition);
     Organization(const Organization &);
     Organization(Organization &&) noexcept;
     Organization &operator=(const Organization &);
@@ -45,6 +48,7 @@ public:
     bool operator!=(const Organization &) const;
 
     static Organization fromJSON(const QJsonObject &);
+    static QVector<Organization> fromJSONArray(const QJsonArray& data);
     QJsonValue toJSON() const;
 
     /** The location of the organization office the person works at. **/

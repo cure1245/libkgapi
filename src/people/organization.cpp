@@ -19,6 +19,27 @@
 
 namespace KGAPI2::People
 {
+
+struct OrganizationDefinition
+{
+    FieldMetadata metadata;
+    QString type;
+    QString formattedType;
+    QDate startDate;
+    QDate endDate;
+    bool current;
+    QString name;
+    QString phoneticName;
+    QString department;
+    QString title;
+    QString jobDescription;
+    QString symbol;
+    QString domain;
+    QString location;
+    QString costCenter;
+    int fullTimeEquivalentMillipercent;
+};
+
 class Organization::Private : public QSharedData
 {
 public:
@@ -63,6 +84,27 @@ public:
 Organization::Organization()
     : d(new Private)
 {
+}
+
+Organization::Organization(const OrganizationDefinition &definition)
+    : d(new Private)
+{
+    d->metadata = definition.metadata;
+    d->type = definition.type;
+    d->formattedType = definition.formattedType;
+    d->startDate = definition.startDate;
+    d->endDate = definition.endDate;
+    d->current = definition.current;
+    d->name = definition.name;
+    d->phoneticName = definition.phoneticName;
+    d->department = definition.department;
+    d->title = definition.title;
+    d->jobDescription = definition.jobDescription;
+    d->symbol = definition.symbol;
+    d->domain = definition.domain;
+    d->location = definition.location;
+    d->costCenter = definition.costCenter;
+    d->fullTimeEquivalentMillipercent = definition.fullTimeEquivalentMillipercent;
 }
 
 Organization::Organization(const Organization &) = default;
@@ -223,8 +265,55 @@ void Organization::setFullTimeEquivalentMillipercent(const int &value)
 
 Organization Organization::fromJSON(const QJsonObject &obj)
 {
-    Q_UNUSED(obj);
+    if(!obj.isEmpty()) {
+        OrganizationDefinition definition;
+
+        const auto metadata = obj.value(QStringLiteral("metadata")).toObject();
+        definition.metadata = FieldMetadata::fromJSON(metadata);
+        definition.type = obj.value(QStringLiteral("type")).toString();
+        definition.formattedType = obj.value(QStringLiteral("formattedType")).toString();
+
+        const auto jsonStartDate = obj.value(QStringLiteral("startDate")).toObject();
+        const auto startYear = jsonStartDate.value(QStringLiteral("year")).toInt();
+        const auto startMonth = jsonStartDate.value(QStringLiteral("month")).toInt();
+        const auto startDay = jsonStartDate.value(QStringLiteral("day")).toInt();
+        definition.startDate = QDate(startYear, startMonth, startDay);
+
+        const auto jsonEndDate = obj.value(QStringLiteral("endDate")).toObject();
+        const auto endYear = jsonEndDate.value(QStringLiteral("year")).toInt();
+        const auto endMonth = jsonEndDate.value(QStringLiteral("month")).toInt();
+        const auto endDay = jsonEndDate.value(QStringLiteral("day")).toInt();
+        definition.endDate = QDate(endYear, endMonth, endDay);
+
+        definition.current = obj.value(QStringLiteral("current")).toBool();
+        definition.name = obj.value(QStringLiteral("name")).toString();
+        definition.phoneticName = obj.value(QStringLiteral("phoneticName")).toString();
+        definition.department = obj.value(QStringLiteral("department")).toString();
+        definition.title = obj.value(QStringLiteral("title")).toString();
+        definition.jobDescription = obj.value(QStringLiteral("jobDescription")).toString();
+        definition.symbol = obj.value(QStringLiteral("symbol")).toString();
+        definition.domain = obj.value(QStringLiteral("domain")).toString();
+        definition.location = obj.value(QStringLiteral("location")).toString();
+        definition.costCenter = obj.value(QStringLiteral("costCenter")).toString();
+        definition.fullTimeEquivalentMillipercent = obj.value(QStringLiteral("fullTimeEquivalentMillipercent")).toInt();
+
+        return Organization(definition);
+    }
     return Organization();
+}
+
+QVector<Organization> Organization::fromJSONArray(const QJsonArray& data)
+{
+    QVector<Organization> organizations;
+
+    for(const auto organization : data) {
+        if(organization.isObject()) {
+            const auto objectifiedOrganization = organization.toObject();
+            organizations.append(fromJSON(objectifiedOrganization));
+        }
+    }
+
+    return organizations;
 }
 
 QJsonValue Organization::toJSON() const
