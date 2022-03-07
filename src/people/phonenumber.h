@@ -17,10 +17,12 @@
 
 class QJsonObject;
 class QJsonValue;
+class QJsonArray;
 
 namespace KGAPI2::People
 {
 class FieldMetadata;
+struct PhoneNumberDefinition;
 
 /**
  * A person's phone number.
@@ -33,6 +35,7 @@ class KGAPIPEOPLE_EXPORT PhoneNumber
 public:
     /** Constructs a new PhoneNumber **/
     explicit PhoneNumber();
+    PhoneNumber(const PhoneNumberDefinition &definition);
     PhoneNumber(const PhoneNumber &);
     PhoneNumber(PhoneNumber &&) noexcept;
     PhoneNumber &operator=(const PhoneNumber &);
@@ -44,6 +47,7 @@ public:
     bool operator!=(const PhoneNumber &) const;
 
     static PhoneNumber fromJSON(const QJsonObject &);
+    static QVector<PhoneNumber> fromJSONArray(const QJsonArray& data);
     QJsonValue toJSON() const;
 
     /** The phone number. **/

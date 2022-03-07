@@ -19,6 +19,16 @@
 
 namespace KGAPI2::People
 {
+
+struct PhoneNumberDefinition
+{
+    FieldMetadata metadata;
+    QString value;
+    QString canonicalForm;
+    QString type;
+    QString formattedType;
+};
+
 class PhoneNumber::Private : public QSharedData
 {
 public:
@@ -50,6 +60,16 @@ public:
 PhoneNumber::PhoneNumber()
     : d(new Private)
 {
+}
+
+PhoneNumber::PhoneNumber(const PhoneNumberDefinition &definition)
+    : d(new Private)
+{
+    d->metadata = definition.metadata;
+    d->value = definition.value;
+    d->canonicalForm = definition.canonicalForm;
+    d->type = definition.type;
+    d->formattedType = definition.formattedType;
 }
 
 PhoneNumber::PhoneNumber(const PhoneNumber &) = default;
@@ -106,8 +126,34 @@ void PhoneNumber::setMetadata(const FieldMetadata &value)
 
 PhoneNumber PhoneNumber::fromJSON(const QJsonObject &obj)
 {
-    Q_UNUSED(obj);
+    if(!obj.isEmpty()) {
+        PhoneNumberDefinition definition;
+
+        const auto metadata = obj.value(QStringLiteral("metadata")).toObject();
+        definition.metadata = FieldMetadata::fromJSON(metadata);
+        definition.value = obj.value(QStringLiteral("value")).toString();
+        definition.canonicalForm = obj.value(QStringLiteral("canonicalForm")).toString();
+        definition.type = obj.value(QStringLiteral("type")).toString();
+        definition.formattedType = obj.value(QStringLiteral("formattedType")).toString();
+
+        return PhoneNumber(definition);
+    }
+
     return PhoneNumber();
+}
+
+QVector<PhoneNumber> PhoneNumber::fromJSONArray(const QJsonArray& data)
+{
+    QVector<PhoneNumber> phoneNumbers;
+
+    for(const auto phoneNumber : data) {
+        if(phoneNumber.isObject()) {
+            const auto objectifiedPhoneNumber = phoneNumber.toObject();
+            phoneNumbers.append(fromJSON(objectifiedPhoneNumber));
+        }
+    }
+
+    return phoneNumbers;
 }
 
 QJsonValue PhoneNumber::toJSON() const
