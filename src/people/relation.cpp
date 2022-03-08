@@ -19,6 +19,15 @@
 
 namespace KGAPI2::People
 {
+
+struct RelationDefinition
+{
+    FieldMetadata metadata;
+    QString person;
+    QString type;
+    QString formattedType;
+};
+
 class Relation::Private : public QSharedData
 {
 public:
@@ -48,6 +57,15 @@ public:
 Relation::Relation()
     : d(new Private)
 {
+}
+
+Relation::Relation(const RelationDefinition &definition)
+    : d(new Private)
+{
+    d->metadata = definition.metadata;
+    d->person = definition.person;
+    d->type = definition.type;
+    d->formattedType = definition.formattedType;
 }
 
 Relation::Relation(const Relation &) = default;
@@ -100,8 +118,33 @@ void Relation::setMetadata(const FieldMetadata &value)
 
 Relation Relation::fromJSON(const QJsonObject &obj)
 {
-    Q_UNUSED(obj);
+    if(!obj.isEmpty()) {
+        RelationDefinition definition;
+
+        const auto metadata = obj.value(QStringLiteral("metadata")).toObject();
+        definition.metadata = FieldMetadata::fromJSON(metadata);
+        definition.person = obj.value(QStringLiteral("person")).toString();
+        definition.type = obj.value(QStringLiteral("type")).toString();
+        definition.formattedType = obj.value(QStringLiteral("formattedType")).toString();
+
+        return Relation(definition);
+    }
+
     return Relation();
+}
+
+QVector<Relation> Relation::fromJSONArray(const QJsonArray& data)
+{
+    QVector<Relation> relations;
+
+    for(const auto relation : data) {
+        if(relation.isObject()) {
+            const auto objectifiedRelation = relation.toObject();
+            relations.append(fromJSON(objectifiedRelation));
+        }
+    }
+
+    return relations;
 }
 
 QJsonValue Relation::toJSON() const

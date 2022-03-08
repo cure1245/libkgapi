@@ -17,10 +17,12 @@
 
 class QJsonObject;
 class QJsonValue;
+class QJsonArray;
 
 namespace KGAPI2::People
 {
 class FieldMetadata;
+struct RelationDefinition;
 
 /**
  * A person's relation to another person.
@@ -33,6 +35,7 @@ class KGAPIPEOPLE_EXPORT Relation
 public:
     /** Constructs a new Relation **/
     explicit Relation();
+    Relation(const RelationDefinition &definition);
     Relation(const Relation &);
     Relation(Relation &&) noexcept;
     Relation &operator=(const Relation &);
@@ -44,6 +47,7 @@ public:
     bool operator!=(const Relation &) const;
 
     static Relation fromJSON(const QJsonObject &);
+    static QVector<Relation> fromJSONArray(const QJsonArray& data);
     QJsonValue toJSON() const;
 
     /** The person's relation to the other person. The type can be custom or one of these predefined values: * `spouse` * `child` * `mother` * `father` *
