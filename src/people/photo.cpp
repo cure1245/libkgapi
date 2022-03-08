@@ -95,8 +95,31 @@ void Photo::setUrl(const QString &value)
 
 Photo Photo::fromJSON(const QJsonObject &obj)
 {
-    Q_UNUSED(obj);
+    if(!obj.isEmpty()) {
+        Photo photo;
+
+        const auto metadata = obj.value(QStringLiteral("metadata")).toObject();
+        photo.setMetadata(FieldMetadata::fromJSON(metadata));
+        photo.setUrl(obj.value(QStringLiteral("url")).toString());
+        photo.setIsDefault(obj.value(QStringLiteral("default")).toBool());
+
+        return photo;
+    }
     return Photo();
+}
+
+QVector<Photo> Photo::fromJSONArray(const QJsonArray& data)
+{
+    QVector<Photo> photos;
+
+    for(const auto photo : data) {
+        if(photo.isObject()) {
+            const auto objectifiedPhoto = photo.toObject();
+            photos.append(fromJSON(objectifiedPhoto));
+        }
+    }
+
+    return photos;
 }
 
 QJsonValue Photo::toJSON() const

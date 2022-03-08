@@ -17,6 +17,7 @@
 
 class QJsonObject;
 class QJsonValue;
+class QJsonArray;
 
 namespace KGAPI2::People
 {
@@ -45,6 +46,7 @@ public:
     bool operator!=(const Photo &) const;
 
     static Photo fromJSON(const QJsonObject &);
+    static QVector<Photo> fromJSONArray(const QJsonArray& data);
     QJsonValue toJSON() const;
 
     /** Metadata about the photo. **/
