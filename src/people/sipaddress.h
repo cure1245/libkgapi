@@ -17,10 +17,12 @@
 
 class QJsonObject;
 class QJsonValue;
+class QJsonArray;
 
 namespace KGAPI2::People
 {
 class FieldMetadata;
+struct SipAddressDefinition;
 
 /**
  * A person's SIP address. Session Initial Protocol addresses are used for VoIP
@@ -34,6 +36,7 @@ class KGAPIPEOPLE_EXPORT SipAddress
 public:
     /** Constructs a new SipAddress **/
     explicit SipAddress();
+    SipAddress(const SipAddressDefinition &definition);
     SipAddress(const SipAddress &);
     SipAddress(SipAddress &&) noexcept;
     SipAddress &operator=(const SipAddress &);
@@ -45,6 +48,7 @@ public:
     bool operator!=(const SipAddress &) const;
 
     static SipAddress fromJSON(const QJsonObject &);
+    static QVector<SipAddress> fromJSONArray(const QJsonArray& data);
     QJsonValue toJSON() const;
 
     /** The SIP address in the [RFC 3261 19.1](https://tools.ietf.org/html/rfc3261#section-19.1) SIP URI format. **/

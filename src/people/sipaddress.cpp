@@ -19,6 +19,15 @@
 
 namespace KGAPI2::People
 {
+
+struct SipAddressDefinition
+{
+    FieldMetadata metadata;
+    QString value;
+    QString type;
+    QString formattedType;
+};
+
 class SipAddress::Private : public QSharedData
 {
 public:
@@ -48,6 +57,15 @@ public:
 SipAddress::SipAddress()
     : d(new Private)
 {
+}
+
+SipAddress::SipAddress(const SipAddressDefinition &definition)
+    : d(new Private)
+{
+    d->metadata = definition.metadata;
+    d->value = definition.value;
+    d->type = definition.value;
+    d->formattedType = definition.formattedType;
 }
 
 SipAddress::SipAddress(const SipAddress &) = default;
@@ -100,8 +118,32 @@ QString SipAddress::formattedType() const
 
 SipAddress SipAddress::fromJSON(const QJsonObject &obj)
 {
-    Q_UNUSED(obj);
+    if(!obj.isEmpty()) {
+        SipAddressDefinition definition;
+
+        const auto metadata = obj.value(QStringLiteral("metadata")).toObject();
+        definition.metadata = FieldMetadata::fromJSON(metadata);
+        definition.value = obj.value(QStringLiteral("value")).toString();
+        definition.type = obj.value(QStringLiteral("type")).toString();
+        definition.formattedType = obj.value(QStringLiteral("formattedType")).toString();
+
+        return SipAddress(definition);
+    }
     return SipAddress();
+}
+
+QVector<SipAddress> SipAddress::fromJSONArray(const QJsonArray& data)
+{
+    QVector<SipAddress> sipAddresses;
+
+    for(const auto sipAddress : data) {
+        if(sipAddress.isObject()) {
+            const auto objectifiedSipAddress = sipAddress.toObject();
+            sipAddresses.append(fromJSON(objectifiedSipAddress));
+        }
+    }
+
+    return sipAddresses;
 }
 
 QJsonValue SipAddress::toJSON() const
