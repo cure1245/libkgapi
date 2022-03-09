@@ -17,6 +17,7 @@
 
 class QJsonObject;
 class QJsonValue;
+class QJsonArray;
 
 namespace KGAPI2::People
 {
@@ -44,6 +45,7 @@ public:
     bool operator!=(const Skill &) const;
 
     static Skill fromJSON(const QJsonObject &);
+    static QVector<Skill> fromJSONArray(const QJsonArray& data);
     QJsonValue toJSON() const;
 
     /** Metadata about the skill. **/

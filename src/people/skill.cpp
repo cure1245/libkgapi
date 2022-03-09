@@ -85,8 +85,30 @@ void Skill::setValue(const QString &value)
 
 Skill Skill::fromJSON(const QJsonObject &obj)
 {
-    Q_UNUSED(obj);
+    if(!obj.isEmpty()) {
+        Skill skill;
+
+        const auto metadata = obj.value(QStringLiteral("metadata")).toObject();
+        skill.setMetadata(FieldMetadata::fromJSON(metadata));
+        skill.setValue(obj.value(QStringLiteral("value")).toString());
+
+        return skill;
+    }
     return Skill();
+}
+
+QVector<Skill> Skill::fromJSONArray(const QJsonArray& data)
+{
+    QVector<Skill> skills;
+
+    for(const auto skill : data) {
+        if(skill.isObject()) {
+            const auto objectifiedSkill = skill.toObject();
+            skills.append(fromJSON(objectifiedSkill));
+        }
+    }
+
+    return skills;
 }
 
 QJsonValue Skill::toJSON() const
