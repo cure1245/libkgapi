@@ -17,10 +17,12 @@
 
 class QJsonObject;
 class QJsonValue;
+class QJsonArray;
 
 namespace KGAPI2::People
 {
 class FieldMetadata;
+struct UrlDefinition;
 
 /**
  * A person's associated URLs.
@@ -33,6 +35,7 @@ class KGAPIPEOPLE_EXPORT Url
 public:
     /** Constructs a new Url **/
     explicit Url();
+    Url(const UrlDefinition &definition);
     Url(const Url &);
     Url(Url &&) noexcept;
     Url &operator=(const Url &);
@@ -44,6 +47,7 @@ public:
     bool operator!=(const Url &) const;
 
     static Url fromJSON(const QJsonObject &);
+    static QVector<Url> fromJSONArray(const QJsonArray& data);
     QJsonValue toJSON() const;
 
     /** The URL. **/

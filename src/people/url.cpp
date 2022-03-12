@@ -19,6 +19,15 @@
 
 namespace KGAPI2::People
 {
+
+struct UrlDefinition
+{
+    FieldMetadata metadata;
+    QString value;
+    QString type;
+    QString formattedType;
+};
+
 class Url::Private : public QSharedData
 {
 public:
@@ -48,6 +57,15 @@ public:
 Url::Url()
     : d(new Private)
 {
+}
+
+Url::Url(const UrlDefinition &definition)
+    : d(new Private)
+{
+    d->metadata = definition.metadata;
+    d->value = definition.value;
+    d->type = definition.type;
+    d->formattedType = definition.formattedType;
 }
 
 Url::Url(const Url &) = default;
@@ -100,8 +118,32 @@ QString Url::formattedType() const
 
 Url Url::fromJSON(const QJsonObject &obj)
 {
-    Q_UNUSED(obj);
+    if(!obj.isEmpty()) {
+        UrlDefinition definition;
+
+        const auto metadata = obj.value(QStringLiteral("metadata")).toObject();
+        definition.metadata = FieldMetadata::fromJSON(metadata);
+        definition.value = obj.value(QStringLiteral("value")).toString();
+        definition.type = obj.value(QStringLiteral("type")).toString();
+        definition.formattedType = obj.value(QStringLiteral("formattedType")).toString();
+
+        return Url(definition);
+    }
     return Url();
+}
+
+QVector<Url> Url::fromJSONArray(const QJsonArray& data)
+{
+    QVector<Url> urls;
+
+    for(const auto url : data) {
+        if(url.isObject()) {
+            const auto objectifiedUrl = url.toObject();
+            urls.append(fromJSON(objectifiedUrl));
+        }
+    }
+
+    return urls;
 }
 
 QJsonValue Url::toJSON() const
