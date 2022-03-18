@@ -29,6 +29,8 @@ namespace PeopleService
 
     KGAPIPEOPLE_EXPORT QUrl fetchAllContactsUrl();
     KGAPIPEOPLE_EXPORT QUrl fetchContactUrl(const QString &fetchQuery, const QString &readMask);
+    KGAPIPEOPLE_EXPORT QUrl createContactUrl();
+    KGAPIPEOPLE_EXPORT QUrl updateContactUrl(QString &resourceName, QString &personFields);
 
 }
 

@@ -76,6 +76,25 @@ QUrl fetchContactUrl(const QString &fetchQuery, const QString &readMask)
     return url;
 }
 
+QUrl createContactUrl()
+{
+    QUrl url(Private::GoogleApisUrl);
+    url.setPath(Private::PeopleBasePath % QStringLiteral(":createContact"));
+    return url;
+}
+
+QUrl updateContactUrl(QString &resourceName, QString &personFields)
+{
+    QUrl url(Private::GoogleApisUrl);
+    url.setPath(QStringLiteral("/v1/") % resourceName % QStringLiteral(":createContact"));
+
+    QUrlQuery query(url);
+    query.addQueryItem(QStringLiteral("updatePersonFields"), personFields);
+
+    url.setQuery(query);
+    return url;
+}
+
 }
 
 }
