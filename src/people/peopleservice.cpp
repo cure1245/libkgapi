@@ -95,6 +95,13 @@ QUrl updateContactUrl(QString &resourceName, QString &personFields)
     return url;
 }
 
+QUrl deleteContactUrl(const QString &resourceName)
+{
+    QUrl url(Private::GoogleApisUrl);
+    url.setPath(QStringLiteral("/v1/") % resourceName % QStringLiteral(":deleteContact"));
+    return url;
+}
+
 }
 
 }
