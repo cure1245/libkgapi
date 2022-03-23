@@ -102,6 +102,23 @@ QUrl deleteContactUrl(const QString &resourceName)
     return url;
 }
 
+ObjectsList parseConnectionsJSONFeed(const QByteArray &jsonFeed)
+{
+    ObjectsList output;
+    const auto document = QJsonDocument::fromJson(jsonFeed);
+
+    if(!document.isObject()) {
+        return {};
+    }
+
+    const auto connections = document.object().value(QStringLiteral("connections")).toArray();
+    for(const auto connection : connections) {
+        output.append(People::Person::fromJSON(connection.toObject()));
+    }
+
+    return output;
+}
+
 }
 
 }
